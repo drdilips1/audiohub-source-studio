@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10151f">
+  <title>Audiohub Source Studio</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">A</div><div><strong>Audiohub</strong><span>Source Studio</span></div></div>
+    <div class="top-actions"><span class="local-pill"><i></i> Browser-based</span><button id="exportTop" class="btn btn-primary">Export JSON ↗</button></div>
+  </header>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">SOURCE BUILDER <span>•</span> V1.0</div>
+      <h1>Build your source.<br><em>Keep control.</em></h1>
+      <p>Create and test source configurations for Audiohub, then export a clean, versioned JSON manifest. No account or AI server required.</p>
+      <div class="hero-stats"><div><b>04</b><span>Source types</span></div><div><b>Live</b><span>API testing</span></div><div><b>JSON</b><span>Portable output</span></div></div>
+    </section>
+
+    <div class="workspace">
+      <aside class="sidebar panel">
+        <div class="side-head"><span class="eyebrow">WORKSPACE</span><button id="newSource" class="icon-btn" title="New source">＋</button></div>
+        <button class="nav-item active" data-tab="builder"><span>◈</span> Source builder</button>
+        <button class="nav-item" data-tab="tester"><span>⌁</span> API tester</button>
+        <button class="nav-item" data-tab="templates"><span>▦</span> Templates</button>
+        <div class="side-divider"></div>
+        <div class="side-label">CURRENT SOURCE</div>
+        <div class="current-source"><div class="source-icon">♫</div><div><b id="sideName">New Audio Source</b><small id="sideType">Audio provider</small></div><span class="status-dot"></span></div>
+        <div class="side-note"><span class="note-icon">✦</span><div><b>Local by design</b><p>Your configuration stays in this browser until you export it.</p></div></div>
+      </aside>
+
+      <section class="main-panel">
+        <div class="panel-title"><div><div class="eyebrow" id="sectionEyebrow">CONFIGURATION</div><h2 id="sectionTitle">Source builder</h2></div><span class="version-tag">Schema v1</span></div>
+
+        <section id="builderView" class="view">
+          <div class="card">
+            <div class="card-head"><div><span class="step">01</span><div><h3>Source identity</h3><p>Name it and choose what it provides.</p></div></div><span class="checkmark">●</span></div>
+            <div class="form-grid">
+              <label class="field wide">Source name<input id="name" value="My Audio Source" placeholder="e.g. Public Library Search"></label>
+              <label class="field">Source type<select id="type"><option value="audio">Audiobook / audio</option><option value="debrid">Debrid resolver</option><option value="ebook">Ebook</option><option value="metadata">Book metadata</option></select></label>
+              <label class="field">Provider ID<input id="providerId" value="my-audio-source" placeholder="lowercase-id"></label>
+              <label class="field wide">Description<input id="description" value="A custom source for Audiohub." placeholder="What does this source do?"></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div><span class="step">02</span><div><h3>Request setup</h3><p>Define the API endpoint and how Audiohub should query it.</p></div></div><span class="optional">OPTIONAL</span></div>
+            <div class="form-grid">
+              <label class="field wide">Base / search URL<input id="url" placeholder="https://api.example.org/search?q={{query}}" value="https://example.org/api/search?q={{query}}"><small>Use <code>{{query}}</code> where the search term should be inserted.</small></label>
+              <label class="field">HTTP method<select id="method"><option>GET</option><option>POST</option></select></label>
+              <label class="field">Response format<select id="responseFormat"><option value="json">JSON</option><option value="text">Text</option></select></label>
+              <label class="field wide">Request headers (JSON)<textarea id="headers" rows="3" spellcheck="false">{}</textarea><small>Never put private tokens into a public manifest. Prefer a server-side proxy for secrets.</small></label>
+              <label class="field wide">POST body template (JSON)<textarea id="body" rows="3" spellcheck="false">{"query":"{{query}}"}</textarea></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div><span class="step">03</span><div><h3>Response mapping</h3><p>Tell Audiohub where the results and fields live in the response.</p></div></div><span class="optional">EDITABLE</span></div>
+            <div class="form-grid">
+              <label class="field wide">Results path<input id="resultsPath" value="results" placeholder="results or data.items"><small>Dot-separated path to the array of result items.</small></label>
+              <label class="field">Title field<input id="titleField" value="title"></label>
+              <label class="field">Author / narrator field<input id="authorField" value="author"></label>
+              <label class="field">Audio / file URL field<input id="mediaField" value="url"></label>
+              <label class="field">Cover image field<input id="coverField" value="cover"></label>
+              <label class="field">Identifier field<input id="idField" value="id"></label>
+              <label class="field">Size / duration field<input id="sizeField" value="size"></label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><span class="step">04</span><div><h3>Test and preview</h3><p>Try a sample query, inspect the response, and export your source.</p></div></div></div>
+            <div class="test-row"><label class="field grow">Test search term<input id="testQuery" value="The Secret Rhonda Byrne" placeholder="Enter a book title"></label><button id="testRequest" class="btn btn-dark">Run API test →</button></div>
+            <div id="testStatus" class="status-message">Ready to test. Example URLs will not return results until you configure a real, lawful API endpoint.</div>
+            <pre id="testOutput" class="response-box">API response will appear here.</pre>
+          </div>
+        </section>
+
+        <section id="testerView" class="view hidden">
+          <div class="card">
+            <div class="card-head"><div><span class="step">API</span><div><h3>Request inspector</h3><p>Test the current source endpoint with a query.</p></div></div></div>
+            <p class="helper">The tester makes a browser request to the endpoint you configured. Some APIs block browser requests using CORS; those require a small same-origin Cloudflare Worker proxy. The included project has a safe proxy template, but you must configure allowed domains before deploying it.</p>
+            <div class="test-row"><label class="field grow">Test search term<input id="testQuery2" value="The Secret Rhonda Byrne"></label><button id="testRequest2" class="btn btn-dark">Send request →</button></div>
+            <div id="testStatus2" class="status-message">No request sent yet.</div><pre id="testOutput2" class="response-box">Response preview will appear here.</pre>
+          </div>
+        </section>
+
+        <section id="templatesView" class="view hidden">
+          <div class="card">
+            <div class="card-head"><div><span class="step">T</span><div><h3>Start from a template</h3><p>Use a starter configuration, then adapt it to an API you are authorized to use.</p></div></div></div>
+            <div class="template-grid">
+              <button class="template-card" data-template="audio"><span class="template-icon violet">♫</span><b>Audio catalogue</b><p>Search an audiobook catalogue and map audio results.</p><span class="template-use">Use template ↗</span></button>
+              <button class="template-card" data-template="debrid"><span class="template-icon blue">⇄</span><b>Debrid resolver</b><p>Represent an authorized debrid service integration.</p><span class="template-use">Use template ↗</span></button>
+              <button class="template-card" data-template="ebook"><span class="template-icon amber">▤</span><b>Ebook catalogue</b><p>Search a legal ebook source and map downloadable items.</p><span class="template-use">Use template ↗</span></button>
+              <button class="template-card" data-template="metadata"><span class="template-icon green">◉</span><b>Book metadata</b><p>Retrieve titles, authors, covers, and identifiers.</p><span class="template-use">Use template ↗</span></button>
+            </div>
+          </div>
+          <div class="card subtle-card"><h3>Templates are examples, not live integrations</h3><p>Each template contains placeholder URLs. Replace them with official APIs or endpoints you have permission to access. Credentials should be handled through a secure backend or Cloudflare secrets, not exported in client-side JSON.</p></div>
+        </section>
+
+        <section class="card output-card">
+          <div class="output-head"><div><div class="eyebrow">GENERATED MANIFEST</div><h3>Audiohub Source JSON</h3><p>Independent schema · Version 1</p></div><div class="output-actions"><button id="copyJson" class="btn btn-light">Copy JSON</button><button id="downloadJson" class="btn btn-primary">Download .json ↓</button></div></div>
+          <pre id="jsonPreview" class="json-preview" aria-label="Generated JSON"></pre>
+          <div class="output-foot"><span><i class="green-dot"></i> Valid JSON</span><span id="byteCount">0 bytes</span><span>audiohub.source.v1</span></div>
+        </section>
+      </section>
+    </div>
+    <footer><span>Audiohub Source Studio</span><span>Independent builder · No account required</span><span>Use APIs responsibly and lawfully.</span></footer>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
